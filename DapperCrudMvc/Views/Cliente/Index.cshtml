@@ -1,0 +1,104 @@
+﻿@model IEnumerable<DapperCrudMvc.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<h1>Listado de Clientes</h1>
+
+<p>
+    <a asp-action="Crear" class="btn btn-sm btn-primary" asp-controller="Cliente">Nuevo Cliente</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PrimerNombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PrimerApellido)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Edad)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PrimerNombre)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PrimerApellido)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Edad)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Editar", new { item.IdCliente }, new { @class = "btn btn-sm btn-secondary" }) |
+                    @Html.ActionLink("Detalle", "Detalle", new { item.IdCliente }, new { @class = "btn btn-sm btn-info" }) |
+                    @* @Html.ActionLink("Eliminar", "Eliminar", new { item.IdCliente }, new { @class = "btn btn-sm btn-danger" }) *@
+                    <button class="btn btn-sm btn-danger" onclick="eliminarCliente(@item.IdCliente)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+
+    eliminarCliente = (idCliente) => {
+
+        Swal.fire({
+            title: "¿Esta seguro de eliminar el Registro?",
+            text: "No podrás revertir esto.!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                console.log(idCliente)
+
+                fetch(`/Cliente/Eliminar/${idCliente}`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                    .then(response => {
+                        if (!response) {
+                            throw new Error('Error al eliminar el cliente.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            title: "Eliminado!",
+                            text: "Se ha eliminado Correctamente.",
+                            icon: "success"
+                        });
+
+                        location.reload();
+                    })
+                    .catch(error => {
+                        // console.error('Error:', error);
+
+                        Swal.fire({
+                            title: "Error!",
+                            text: error,
+                            icon: "error"
+                        });
+                    });
+            }
+        });
+    }
+
+</script>
+
